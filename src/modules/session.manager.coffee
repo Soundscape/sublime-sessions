@@ -11,7 +11,13 @@ init = (keys, options) ->
     scope: 'friends,email'
   , options))
 
+# Manager for all use sessions
 class SessionManager extends Core.CoreObject
+  # Construct a new SessionManager
+  #
+  # @param [Array] networks The networks to provide for
+  # @param [Object] keys The Hello.js network adapters
+  # @param [Object] options The configuration for Hello.js initialization
   constructor: (networks, keys, options) ->
     super()
     @_networks = networks
@@ -21,6 +27,10 @@ class SessionManager extends Core.CoreObject
     for network in @_networks
       @session network
 
+  # Create or retrieve the session for the given network.
+  # If no network is specified it retrieves the first active or available session
+  #
+  # @param [String] network The name of the network
   session: (network) ->
     if !network
       active = @activeSessions()
@@ -37,15 +47,18 @@ class SessionManager extends Core.CoreObject
     if -1 == @_networks.indexOf network then null
     else @_sessions[network] = @_sessions[network] or new Session network
 
+  # Checks if there is an authenticated session
   authenticated: () ->
     session = @session()
     if !session then false
     else session.state() == 'authenticated'
 
+  # Retrieves all sessions
   sessions: () ->
     @_networks.map (network) =>
       @session network
 
+  # Retrieves all available sessions and provides the ability to sign out of all instances
   availableSessions: () ->
     res = @sessions().filter (session) ->
       session.isAvailable()
@@ -56,10 +69,12 @@ class SessionManager extends Core.CoreObject
 
     res
 
+  # Retrieves all inactive sessions
   inactiveSessions: () ->
     @sessions().filter (session) ->
       !session.isActive()
 
+  # Retrieves all active sessions and provides the ability to sign out of all instances
   activeSessions: () ->
     res = @sessions().filter (session) ->
       session.isActive()
@@ -81,6 +96,7 @@ class SessionManager extends Core.CoreObject
 
     res
 
+  # Sign into te first available session
   signIn: () ->
     session = @session()
     if !session
@@ -88,6 +104,7 @@ class SessionManager extends Core.CoreObject
 
     session.signIn()
 
+  # Sign out of all available sessions
   signOut: () ->
     @availableSessions().signOut()
 

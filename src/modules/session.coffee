@@ -40,32 +40,41 @@ states =
             dfr.reject res.error
       return
 
+# Provides a user session container
 class Session extends Core.Stateful
+  # Construct a new Session
+  #
+  # @param [String] network The name of the network/adapter
   constructor: (network) ->
     super(states)
     @network = network
 
+  # Sign in
   signIn: () ->
     dfr = When.defer()
     @apply 'signIn', @, dfr
     dfr.promise
 
+  # Sign out
   signOut: () ->
     dfr = When.defer()
     @apply 'signOut', @, dfr
     dfr.promise
 
+  # Fetch the user profile
   profile: () ->
     dfr = When.defer()
     @apply 'profile', @, dfr
     dfr.promise
 
+  # Checks if this session has yet to expire
   isAvailable: () ->
     auth = hello(@network).getAuthResponse()
     time = (new Date()).getTime() / 1000
 
     auth && auth.access_token && auth.expires > time
 
+  # Checks if this session is currently authenticated
   isActive: () ->
     @state() == 'authenticated' && @isAvailable()
 

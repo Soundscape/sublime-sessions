@@ -1,6 +1,6 @@
 {
   "name": "sublime-sessions",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "User session providers",
   "main": "./out/index",
   "scripts": {
